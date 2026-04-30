@@ -1,4 +1,4 @@
-name: Python CI/CD
+name: Python CI
 
 on:
   push:
@@ -7,6 +7,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
 
@@ -18,34 +19,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest  # Гарантуємо наявність pytest для тестування
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install -r requirements.txt
 
       - name: Run tests
         run: |
-          # Використовуємо pytest. Якщо тестів немає, крок не "впаде" завдяки || true (опціонально)
-          pytest || echo "No tests found or tests failed"
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Simulated Setup SSH
-        run: |
-          echo "Setting up SSH keys for ${{ secrets.USERNAME }}..."
-          echo "Host: ${{ secrets.HOST }}"
-          # Ми просто імітуємо створення ключів, щоб крок був успішним
-          mkdir -p ~/.ssh
-          echo "SSH setup complete."
-
-      - name: Deploying to Production
-        run: |
-          echo "Connecting to ${{ secrets.HOST }}..."
-          echo "Updating code from repository..."
-          echo "Running: docker compose up -d --build"
-          echo "Checking application health..."
-          sleep 5
-          echo "SUCCESS: Nest.js application deployed to http://${{ secrets.HOST }}"
+          pytest
